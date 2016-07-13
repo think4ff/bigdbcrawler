@@ -1,4 +1,4 @@
-##확장자제외
+##확장자제외(file type : csv)
 OUTPUT_FILE=./data/weatherOutput
 ##시작년월
 START_YYYYMM=201512
