@@ -1,0 +1,6 @@
+##확장자제외
+OUTPUT_FILE=./data/weatherOutput
+##시작년월
+START_YYYYMM=201512
+##끝년월
+END_YYYYMM=201601
