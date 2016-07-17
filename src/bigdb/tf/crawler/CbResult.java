@@ -59,13 +59,31 @@ public class CbResult
 			if(dLoop == 5) averageCloud  = rsValue.replaceAll("[^0-9/./-]", "");
 			if(dLoop == 6) rainfall      = rsValue.replaceAll("[^0-9/./-]", "");
 		}
+		
 		if(averageCloud.length() == 0 || "-".equals(averageCloud))
 			averageCloud = "0";
 		if(rainfall.length() == 0 || "-".equals(rainfall))
 			rainfall = "0.0";
 		
-		String rowData = String.format("%s,%s,%s,%s,%s,%s,%s", this.location, currDate, averageTemper, highTemper
-														  , lowTemper, averageCloud, rainfall   );
+		float avgCloud = Float.parseFloat(averageCloud);
+		float dayRainy = Float.parseFloat(rainfall);
+		String weather = "";
+		
+		if(avgCloud >= 0 && 2 >= avgCloud)
+			weather = "¸¼À½";
+		if(avgCloud > 2 && 6 > avgCloud)
+			weather = "±¸¸§Á¶±Ý";
+		if(avgCloud >= 6 && 9 > avgCloud)
+			weather = "±¸¸§¸¹À½";
+		if(avgCloud >= 9 && 10 >= avgCloud)
+			weather = "Èå¸²";
+		if(dayRainy > 0.5)
+			weather = "ºñ";
+		if(dayRainy >= 80)
+			weather = "Æø¿ì";
+		
+		String rowData = String.format("%s,%s,%s,%s,%s,%s,%s,%s", this.location, currDate, averageTemper, highTemper
+														  , lowTemper, averageCloud, rainfall, weather );
 		return rowData;
 	}
 

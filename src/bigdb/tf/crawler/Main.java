@@ -33,8 +33,8 @@ public class Main {
 	
 	static String propertyFile = "./weatherCrawler.property";
 	static String outFileName; //= "./data/weatherOutput.csv";
-	static String header = "location_code,location,date,averageTemper,highTemper,lowTemper,averageCloud,rainfall";
-//	static String header = "date_yyyyMMdd,평균기온_℃,최고기온_℃,최저기온_℃,평균운량,일강수량_mm";
+	static String header = "location_code,location,date,averageTemper,highTemper,lowTemper,averageCloud,rainfall,weather";
+//	static String header = "date_yyyyMMdd,평균기온_℃,최고기온_℃,최저기온_℃,평균운량,일강수량_mm,날씨";
 	static String delim = " \r\n";
 	static int startYear;
 	static int startMonth;
@@ -42,7 +42,7 @@ public class Main {
 	static int endMonth;
 
 	public static void main(String[] args) throws Exception {
-
+		String encoding    = "UTF-8";
 		String location    = "";
 		String startYYYYmm = "";
 		String endYYYYmm   = "";
@@ -52,27 +52,28 @@ public class Main {
 		try {
 			emvPp.load(ppFnm);
 			outFileName = emvPp.getProperty("OUTPUT_FILE");
+			encoding    = emvPp.getProperty("ENCODING_TYPE");
 			location    = emvPp.getProperty("LOCATION");
 			startYYYYmm = emvPp.getProperty("START_YYYYMM");
 			endYYYYmm   = emvPp.getProperty("END_YYYYMM");
 		} finally {
 			closeQuietly(ppFnm); //close property file
 		}
-//		System.out.println("outFileName::" + outFileName);
-//		System.out.println("location::" + location);
-//		System.out.println("startYYYYmm::" + startYYYYmm);
-//		System.out.println("endYYYYmm::"   + endYYYYmm);
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append(outFileName).append("_").append(startYYYYmm).append("_").append(endYYYYmm).append(".csv");
 		FileOutputStream outFile = new FileOutputStream(sb.toString());
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outFile, "MS949"));
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outFile, encoding));
 		
 		List<String> arrLoc = new ArrayList<String>();
 		StringTokenizer tokens = new StringTokenizer( location, "," );
-		for( int i = 1; tokens.hasMoreElements(); i++ )
+		
+//		int i = 0;
+		while(tokens.hasMoreElements())
 		{
 			arrLoc.add(tokens.nextToken().trim());
-//			System.out.println("arrloc" + arrLoc.get(i-1));
+//			System.out.println("arrloc:" + arrLoc.get(i));
+//			i++;
 		}
 		
 		//cvs header write.

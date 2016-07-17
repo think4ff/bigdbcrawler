@@ -1,5 +1,7 @@
 ##확장자제외(file type : csv)
 OUTPUT_FILE=./data/weatherOutput
+##output file encoding
+ENCODING_TYPE=UTF-8
 ##지역(코드)
 LOCATION=184,185,188,189
 ##시작년월
