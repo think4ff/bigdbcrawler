@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -32,8 +33,8 @@ public class Main {
 	
 	static String propertyFile = "./weatherCrawler.property";
 	static String outFileName; //= "./data/weatherOutput.csv";
-//	static String header = "date_yyyyMMdd,averageTemper_℃,highTemper_℃,lowTemper_℃,averageCloud,rainfall_mm";
-	static String header = "date_yyyyMMdd,평균기온_℃,최고기온_℃,최저기온_℃,평균운량,일강수량_mm";
+	static String header = "location_code,location,date,averageTemper,highTemper,lowTemper,averageCloud,rainfall";
+//	static String header = "date_yyyyMMdd,평균기온_℃,최고기온_℃,최저기온_℃,평균운량,일강수량_mm";
 	static String delim = " \r\n";
 	static int startYear;
 	static int startMonth;
@@ -42,6 +43,7 @@ public class Main {
 
 	public static void main(String[] args) throws Exception {
 
+		String location    = "";
 		String startYYYYmm = "";
 		String endYYYYmm   = "";
 		
@@ -50,12 +52,14 @@ public class Main {
 		try {
 			emvPp.load(ppFnm);
 			outFileName = emvPp.getProperty("OUTPUT_FILE");
+			location    = emvPp.getProperty("LOCATION");
 			startYYYYmm = emvPp.getProperty("START_YYYYMM");
 			endYYYYmm   = emvPp.getProperty("END_YYYYMM");
 		} finally {
 			closeQuietly(ppFnm); //close property file
 		}
 //		System.out.println("outFileName::" + outFileName);
+//		System.out.println("location::" + location);
 //		System.out.println("startYYYYmm::" + startYYYYmm);
 //		System.out.println("endYYYYmm::"   + endYYYYmm);
 		StringBuilder sb = new StringBuilder();
@@ -63,12 +67,29 @@ public class Main {
 		FileOutputStream outFile = new FileOutputStream(sb.toString());
 		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outFile, "MS949"));
 		
-		preProcess(startYYYYmm, endYYYYmm, writer);
-
+		List<String> arrLoc = new ArrayList<String>();
+		StringTokenizer tokens = new StringTokenizer( location, "," );
+		for( int i = 1; tokens.hasMoreElements(); i++ )
+		{
+			arrLoc.add(tokens.nextToken().trim());
+//			System.out.println("arrloc" + arrLoc.get(i-1));
+		}
+		
+		//cvs header write.
+		try {
+			writer.write(header + delim); 
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		//지역별 조회
+		for(String pLocation : arrLoc) 
+		{
+			preProcess(pLocation, startYYYYmm, endYYYYmm, writer);
+		}
 		closeQuietly(writer); //close for writer
 	}
 	
-	static void preProcess(String startYYYYmm, String endYYYYmm, BufferedWriter writer) {
+	static void preProcess(String location, String startYYYYmm, String endYYYYmm, BufferedWriter writer) {
 		//기상청 URL
 		String url = "http://www.kma.go.kr/weather/climate/past_cal.jsp";
 		
@@ -76,7 +97,8 @@ public class Main {
 		System.out.println("loopCnt::" + loopCnt);
 		
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("stn", "235");// 지점(지역)
+//		params.put("stn", "235");// 지점(지역)
+		params.put("stn", location);// 지점(지역)
 		params.put("x", "23");   //?
 		params.put("y", "9");    //?
 		params.put("obs", "1");  // 요소(1:기온/강수량, 2:날씨)
@@ -84,11 +106,6 @@ public class Main {
 //		params.put("mm", "07");  // 월
 		
 		List<String> resultCVS = new ArrayList<String>();
-		try {
-			writer.write(header + delim); //cvs header write.
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
 		
 		int inYY = startYear, inMM = startMonth;
 		for(int i=0; i <= loopCnt; i++) 
@@ -98,7 +115,7 @@ public class Main {
 			params.put("yy", Integer.toString(inYY));// 년도
 			params.put("mm", Integer.toString(inMM));// 월			
 			
-			resultCVS = loadCrawlingHtml(url, params);
+			resultCVS = loadCrawlingHtml(url, location, params);
 			writeFile(resultCVS, writer);
 			
 			if(inMM == 12)
@@ -110,7 +127,7 @@ public class Main {
 		}
 	}
 
-	static List<String> loadCrawlingHtml(String url, Map<String, Object> params) {
+	static List<String> loadCrawlingHtml(String url, String location, Map<String, Object> params) {
 		String responseHtml = "";
 		List<String> rsCVS = new ArrayList<String>();
 		
@@ -130,6 +147,8 @@ public class Main {
 		}
 
 		CbResult rs = new CbResult(parser.getTitle(), results);
+		//result에 지역 세팅
+		rs.setLocation(location);
 //		out.println("타이틀:" + rs.getTitle());
 		String currYrMon = getYrMonth(rs.getTitle());
 		String currDate = "";

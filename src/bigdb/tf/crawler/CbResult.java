@@ -8,6 +8,7 @@ public class CbResult
 {
 	private String			title;
 	private List<String>	datas;
+	private String          location;
 
 	public CbResult(String title, List<String> datas)
 	{
@@ -63,8 +64,22 @@ public class CbResult
 		if(rainfall.length() == 0 || "-".equals(rainfall))
 			rainfall = "0.0";
 		
-		String rowData = String.format("%s,%s,%s,%s,%s,%s", currDate, averageTemper, highTemper
+		String rowData = String.format("%s,%s,%s,%s,%s,%s,%s", this.location, currDate, averageTemper, highTemper
 														  , lowTemper, averageCloud, rainfall   );
 		return rowData;
+	}
+
+	public String getLocation() {
+		return this.location;
+	}
+	public void setLocation(String location) {
+		if("184".equals(location))
+			this.location = "184,제주";
+		if("185".equals(location))
+			this.location = "185,고산";
+		if("188".equals(location))
+			this.location = "188,성산";
+		if("189".equals(location))
+			this.location = "189,서귀포";
 	}
 }
