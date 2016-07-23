@@ -195,10 +195,10 @@ public class Main {
 		if(date.length() == 6)
 			month = date.substring(4,6).trim();
 		else 
-			month = date.substring(4,5).trim();
+			month = "0" + date.substring(4,5).trim();
 		
-		if(month.length() == 1)
-			month = "0" + month;
+//		if(month.length() == 1)
+//			month = "0" + month;
 		
 		return year + month;
 	}  
