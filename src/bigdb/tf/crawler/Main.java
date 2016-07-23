@@ -187,14 +187,15 @@ public class Main {
 	}
 	
 	static String getYrMonth(String inDate)	{
-		String date = "";
-		if(inDate.length() == 9)
-			date = inDate.replaceAll(" ", "");
-		else 
-			date = inDate;
+		String date = inDate.replaceAll("[^0-9]", "");
 		
 		String year  = date.substring(0,4).trim();
-		String month = date.substring(5,7).trim();
+		String month = "";
+		
+		if(date.length() == 6)
+			month = date.substring(4,6).trim();
+		else 
+			month = date.substring(4,5).trim();
 		
 		if(month.length() == 1)
 			month = "0" + month;
