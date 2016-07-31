@@ -59,14 +59,17 @@ public class CbResult
 			if(dLoop == 5) averageCloud  = rsValue.replaceAll("[^0-9/./-]", "");
 			if(dLoop == 6) rainfall      = rsValue.replaceAll("[^0-9/./-]", "");
 		}
-		
+
+		if(averageTemper.length() == 0 || "-".equals(averageTemper))
+			averageTemper = "0";
 		if(averageCloud.length() == 0 || "-".equals(averageCloud))
 			averageCloud = "0";
 		if(rainfall.length() == 0 || "-".equals(rainfall))
 			rainfall = "0.0";
 		
-		float avgCloud = Float.parseFloat(averageCloud);
-		float dayRainy = Float.parseFloat(rainfall);
+		float avgCloud  = Float.parseFloat(averageCloud);
+		float dayRainy  = Float.parseFloat(rainfall);
+		float dayTemper = Float.parseFloat(lowTemper);
 		String weather = "";
 		
 		if(avgCloud >= 0 && 2 >= avgCloud)
@@ -79,6 +82,8 @@ public class CbResult
 			weather = "Èå¸²";
 		if(dayRainy > 0.5)
 			weather = "ºñ";
+		if(dayRainy > 0.5 && dayTemper < -5)
+			weather = "´«";
 		if(dayRainy >= 80)
 			weather = "Æø¿ì";
 		
@@ -99,5 +104,9 @@ public class CbResult
 			this.location = "188,¼º»ê";
 		if("189".equals(location))
 			this.location = "189,¼­±ÍÆ÷";
+		if("101".equals(location))
+			this.location = "101,ÃáÃµ";
+		if("133".equals(location))
+			this.location = "133,´ëÀü";
 	}
 }
